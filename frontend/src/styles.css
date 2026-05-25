@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  button, input, select {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .input {
+    @apply mb-3 w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gso-blue focus:ring-4 focus:ring-blue-900/10 disabled:cursor-not-allowed disabled:bg-slate-100;
+  }
+
+  .table-input {
+    @apply w-44 rounded border border-slate-300 px-2 py-1.5 text-sm outline-none transition focus:border-gso-blue focus:ring-2 focus:ring-blue-900/10 disabled:cursor-not-allowed disabled:bg-slate-100;
+  }
+
+  .btn-primary,
+  .btn-success,
+  .btn-danger,
+  .btn-info,
+  .btn-secondary,
+  .btn-warning,
+  .btn-light {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:bg-slate-300;
+  }
+
+  .btn-primary {
+    @apply bg-gso-green hover:bg-green-700;
+  }
+
+  .btn-success {
+    @apply bg-green-600 hover:bg-green-700;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700;
+  }
+
+  .btn-info {
+    @apply bg-blue-600 hover:bg-blue-700;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-500 hover:bg-slate-600;
+  }
+
+  .btn-warning {
+    @apply bg-amber-500 text-slate-950 hover:bg-amber-600;
+  }
+
+  .btn-light {
+    @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50;
+  }
+
+  .btn-page {
+    @apply inline-flex min-h-9 items-center justify-center gap-1 rounded border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-gso-blue transition hover:border-gso-blue hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-page.active {
+    @apply border-gso-blue bg-gso-blue text-white;
+  }
+}
