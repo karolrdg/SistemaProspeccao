@@ -27,7 +27,7 @@ namespace ApiProspeccaoGSO.Controllers
             _connectionString = configuration.GetConnectionString("DbProspeccao")
                 ?? throw new Exception("String de conexão não encontrada.");
             _jwtKey = configuration["JwtSettings:SecretKey"]
-                ?? "ChaveSuperSecretaDaGSOMedicinaOcupacional2026";
+                ?? throw new Exception("JwtSettings:SecretKey não configurada.");
         }
 
         [HttpPost("login")]

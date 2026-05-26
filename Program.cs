@@ -15,7 +15,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 
 // 3. Puxa a MESMA chave do appsettings.json.
-var chaveJwt = builder.Configuration["JwtSettings:SecretKey"] ?? "ChaveSuperSecretaDaGSOMedicinaOcupacional2026";
+var chaveJwt = builder.Configuration["JwtSettings:SecretKey"]
+    ?? throw new InvalidOperationException("JwtSettings:SecretKey nao configurada.");
 var key = Encoding.ASCII.GetBytes(chaveJwt);
 
 // 4. Configura a autenticacao JWT.
