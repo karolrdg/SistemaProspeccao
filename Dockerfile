@@ -14,4 +14,4 @@ ENV ASPNETCORE_URLS=http://+:10000
 
 EXPOSE 10000
 
-ENTRYPOINT ["dotnet", "SistemaProspeccao.dll"]
+ENTRYPOINT ["dotnet", "ApiProspeccaoGSO.dll"]
