@@ -26,7 +26,7 @@ export function LoginPage({ onLogin }) {
   return (
     <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top_left,#086498,#002b4b_46%,#00182a)] px-4">
       <form onSubmit={handleLogin} className="w-full max-w-sm rounded-lg bg-white p-8 text-center shadow-2xl">
-        <img src="/img/logo-login.png" alt="Grupo GSO" className="mx-auto mb-7 max-h-24 max-w-48 object-contain" />
+        <img src="/img/logo-login.png" alt="Grupo ProspectCRM" className="mx-auto mb-7 max-h-24 max-w-48 object-contain" />
         <label className="sr-only" htmlFor="login-email">E-mail</label>
         <input
           id="login-email"
