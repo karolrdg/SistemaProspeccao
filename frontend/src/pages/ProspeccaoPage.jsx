@@ -204,11 +204,11 @@ export function ProspeccaoPage({ session, logout, ui }) {
     <>
       <section className="mb-5 flex flex-col gap-3 border-b border-slate-200 pb-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gso-blue">Prospecao de Empresas</h1>
+          <h1 className="text-2xl font-bold text-gso-blue">Prospecção de Empresas</h1>
           <p className="text-sm text-slate-500">{empresas.length > 0 ? `${empresas.length} empresas carregadas` : 'Use os filtros para buscar oportunidades'}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={traceRoute} className="btn-info"><Route size={16} />Tracar Rota</button>
+          <button type="button" onClick={traceRoute} className="btn-info"><Route size={16} />Traçar Rota</button>
           <button type="button" onClick={exportCsv} className="btn-danger"><Download size={16} />Exportar My Maps</button>
           <a href="https://www.google.com/mymaps" target="_blank" rel="noreferrer" className="btn-success"><Map size={16} />Abrir My Maps</a>
         </div>
