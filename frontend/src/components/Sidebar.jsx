@@ -15,7 +15,7 @@ export function Sidebar({ activeSection, setActiveSection, nome, logout }) {
       <nav className="flex-1 pt-4">
         <button type="button" className={itemClass('prospeccao')} onClick={() => setActiveSection('prospeccao')}>
           <Search className="h-5 min-w-11" />
-          <span className="opacity-0 transition group-hover:opacity-100">Prospeccao</span>
+          <span className="opacity-0 transition group-hover:opacity-100">Prospecção</span>
         </button>
         <button type="button" className={itemClass('usuarios')} onClick={() => setActiveSection('usuarios')}>
           <UsersRound className="h-5 min-w-11" />
