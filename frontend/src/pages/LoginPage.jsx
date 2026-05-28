@@ -54,7 +54,6 @@ export function LoginPage({ onLogin }) {
               />
             </div>
 
-            {/* TEXOS */}
             <div className="max-w-xl">
               <h1 className="mb-2 text-3xl font-extrabold leading-tight text-white">
                 Transforme sua equipe de vendas com o ProspectCRM
