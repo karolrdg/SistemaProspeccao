@@ -30,14 +30,17 @@ export function LoginPage({ onLogin }) {
       <div className="grid min-h-screen lg:grid-cols-2">
 
         {/* LADO ESQUERDO */}
-        <section className="relative hidden overflow-hidden lg:flex">
+        <section className="relative flex min-h-screen overflow-hidden">
 
-          {/* IMAGEM */}
           <img
-            src="/img/vendedoras-prospectcrm.png"
-            alt="Equipe ProspectCRM"
-            className="h-full w-full object-cover"
+            src={`${window.location.origin}/img/vendedoras-prospectcrm.png`}
+            alt="Equipe"
+            className="absolute inset-0 h-full w-full object-cover"
           />
+
+          <div className="absolute inset-0 bg-black/40" />
+
+
 
           {/* OVERLAY ESCURO */}
           <div className="absolute inset-0 bg-black/55" />
@@ -160,6 +163,6 @@ export function LoginPage({ onLogin }) {
           </div>
         </section>
       </div>
-    </main>
+    </main >
   );
 }
