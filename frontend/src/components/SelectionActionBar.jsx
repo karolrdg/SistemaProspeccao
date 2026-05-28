@@ -10,7 +10,7 @@ export function SelectionActionBar({ count, onTraceRoute, onExportCsv, onClear }
         <p className="text-xs text-slate-500">Use a seleção para rota ou exportação.</p>
       </div>
       <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={onTraceRoute} className="btn-info"><Route size={16} />Tracar rota</button>
+        <button type="button" onClick={onTraceRoute} className="btn-info"><Route size={16} />Traçar rota</button>
         <button type="button" onClick={onExportCsv} className="btn-danger"><Download size={16} />Exportar CSV</button>
         <button type="button" onClick={onClear} className="btn-light"><X size={16} />Limpar</button>
       </div>

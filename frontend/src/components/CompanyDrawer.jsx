@@ -34,7 +34,7 @@ export function CompanyDrawer({ emp, onClose, onOpenMap }) {
           </section>
 
           <section className="rounded-lg border border-slate-200 p-4">
-            <h3 className="mb-3 text-sm font-bold uppercase text-slate-500">Classificacao</h3>
+            <h3 className="mb-3 text-sm font-bold uppercase text-slate-500">Classificação</h3>
             <InfoLine icon={<Tag size={17} />} label="CNAE" value={getField(emp, ['cnaeDescricao', 'CnaeDescricao'], '-')} />
             <InfoLine icon={<Tag size={17} />} label="Segmento" value={getField(emp, ['segmento', 'Segmento'], '-')} />
             <InfoLine icon={<Tag size={17} />} label="Porte" value={getField(emp, ['porte', 'Porte'], '-')} />
