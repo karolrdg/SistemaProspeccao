@@ -4,6 +4,7 @@ obj/
 frontend/node_modules/
 frontend/.npm-cache/
 frontend/dist/
+appsettings.Development.json
 
 
 *.user
