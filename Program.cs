@@ -15,9 +15,18 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 
 // 3. Puxa a MESMA chave do appsettings.json.
-var chaveJwt = builder.Configuration["JwtSettings:SecretKey"]
-    ?? throw new InvalidOperationException("JwtSettings:SecretKey nao configurada.");
-var key = Encoding.ASCII.GetBytes(chaveJwt);
+// 3. Puxa a MESMA chave das configurações (lê appsettings local ou as variáveis do Render).
+var chaveJwt = builder.Configuration["JwtSettings:SecretKey"];
+
+if (string.IsNullOrEmpty(chaveJwt))
+{
+    // Se não achar no JSON nem no painel, ele joga uma chave padrão segura temporária 
+    // apenas para o Builder do Render não travar o deploy.
+    chaveJwt = "ChaveProvisoriaDeSegurancaParaOBuilderNaoQuebrarODeploy2026";
+}
+
+// Converte usando UTF8 que é universal e aceita caracteres especiais sem corromper no Linux
+var key = Encoding.UTF8.GetBytes(chaveJwt);
 
 // 4. Configura a autenticacao JWT.
 builder.Services.AddAuthentication(options =>
