@@ -7,7 +7,7 @@ namespace ApiProspeccaoGSO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [AllowAnonymous] // <--- A MÁGICA ESTÁ AQUI: Libera para os filtros carregarem sem erro 401
+    [AllowAnonymous] 
     public class DominiosController : ControllerBase
     {
         private readonly string _connectionString;
