@@ -1,4 +1,4 @@
-import { KeyRound, Trash2, UserCheck } from 'lucide-react';
+import { KeyRound, ShieldCheck, Trash2, UserCheck, UsersRound } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { alterarSenhaApi, apagarUsuarioApi, cadastrarUsuarioApi, listarUsuarios } from '../api/usuariosApi';
 import { parseResponse } from '../api/http';
@@ -87,15 +87,22 @@ export function UsuariosPage({ session, logout, ui }) {
   }
 
   return (
-    <section>
-      <div className="mb-5 border-b border-slate-200 pb-4">
-        <h1 className="text-2xl font-bold text-gso-blue">Gerenciar Colaboradores</h1>
-        <p className="text-sm text-slate-500">Cadastro, senha e acesso dos vendedores.</p>
+    <section className="mx-auto max-w-[1680px]">
+      <div className="mb-7 flex items-start gap-4">
+        <div className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 sm:flex"><UsersRound size={24} /></div>
+        <div>
+          <p className="section-kicker mb-1">Workspace <span className="px-1 text-slate-300">/</span> Administração</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-[34px]">Colaboradores</h1>
+          <p className="mt-1.5 text-sm text-slate-500">Gerencie acessos e mantenha sua equipe comercial atualizada.</p>
+        </div>
       </div>
-      {message && <div className="mb-4 rounded bg-sky-50 px-4 py-3 text-sm font-semibold text-sky-800">{message}</div>}
-      <div className="grid gap-5 xl:grid-cols-[minmax(280px,380px)_1fr]">
-        <form onSubmit={cadastrarUsuario} className="rounded-lg bg-white p-5 shadow-soft">
-          <h2 className="mb-4 text-lg font-bold text-gso-blue">Novo Colaborador</h2>
+      {message && <div className="mb-5 rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm font-medium text-sky-800">{message}</div>}
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(300px,380px)_1fr]">
+        <form onSubmit={cadastrarUsuario} className="surface-card p-5 sm:p-6">
+          <div className="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><UserCheck size={18} /></div>
+            <div><h2 className="font-semibold text-slate-900">Novo colaborador</h2><p className="mt-0.5 text-xs text-slate-500">Crie um acesso para sua equipe.</p></div>
+          </div>
           <Field label="Nome"><input className="input" value={form.nome} onChange={(e) => setForm((prev) => ({ ...prev, nome: e.target.value }))} required /></Field>
           <Field label="E-mail"><input type="email" className="input" value={form.email} onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))} required /></Field>
           <Field label="Senha"><input type="password" className="input" value={form.senha} onChange={(e) => setForm((prev) => ({ ...prev, senha: e.target.value }))} required /></Field>
@@ -105,20 +112,24 @@ export function UsuariosPage({ session, logout, ui }) {
               <option value="Admin">Administrador</option>
             </select>
           </Field>
-          <button className="btn-primary mt-2 w-full" type="submit"><UserCheck size={16} />Autorizar Cadastro</button>
+          <button className="btn-primary mt-4 w-full" type="submit"><UserCheck size={16} />Criar colaborador</button>
         </form>
-        <div className="overflow-hidden rounded-lg bg-white shadow-soft">
+        <div className="surface-card overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-5">
+            <div><h2 className="font-semibold text-slate-900">Equipe cadastrada</h2><p className="mt-1 text-xs text-slate-500">{usuarios.length} colaboradores</p></div>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-500"><ShieldCheck size={18} /></span>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="bg-gso-blue text-xs uppercase text-white">
+              <thead className="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 <tr><Th>Nome</Th><Th>E-mail</Th><Th>Nivel</Th><Th center>Acoes</Th></tr>
               </thead>
               <tbody>
                 {usuarios.map((user) => (
-                  <tr key={user.id || user.Id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <tr key={user.id || user.Id} className="border-b border-slate-100 transition-colors hover:bg-slate-50/80">
                     <td className="px-4 py-3 font-semibold">{user.nome || user.Nome}</td>
                     <td className="px-4 py-3">{user.email || user.Email}</td>
-                    <td className="px-4 py-3">{user.nivel || user.Nivel}</td>
+                    <td className="px-4 py-3"><span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">{user.nivel || user.Nivel}</span></td>
                     <td className="px-4 py-3">
                       <div className="flex justify-center gap-2">
                         <IconButton title="Alterar senha" className="bg-sky-700 hover:bg-sky-800" onClick={() => alterarSenha(user)}><KeyRound size={16} /></IconButton>

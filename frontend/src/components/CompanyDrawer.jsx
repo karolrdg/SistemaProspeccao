@@ -4,10 +4,10 @@ import { getField } from '../utils/object';
 
 export function CompanyDrawer({ emp, onClose, onOpenMap }) {
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/50">
+    <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/45 backdrop-blur-[2px]">
       <button type="button" className="hidden flex-1 cursor-default md:block" onClick={onClose} aria-label="Fechar detalhes" />
-      <aside className="h-full w-full max-w-xl overflow-y-auto bg-white shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-200 bg-white p-5">
+      <aside className="h-full w-full max-w-xl overflow-y-auto border-l border-slate-200 bg-white shadow-2xl">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-100 bg-white/95 p-6 backdrop-blur">
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Detalhes da empresa</p>
             <h2 className="mt-1 text-xl font-bold text-gso-blue">{getField(emp, ['razaoSocial', 'RazaoSocial', 'razaosocial'], '-')}</h2>
@@ -18,23 +18,23 @@ export function CompanyDrawer({ emp, onClose, onOpenMap }) {
           </button>
         </div>
 
-        <div className="space-y-5 p-5">
-          <section className="rounded-lg border border-slate-200 p-4">
-            <h3 className="mb-3 text-sm font-bold uppercase text-slate-500">Contato</h3>
+        <div className="space-y-4 p-5 sm:p-6">
+          <section className="rounded-2xl border border-slate-200 p-4">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">Contato</h3>
             <InfoLine icon={<Mail size={17} />} label="E-mail" value={String(getField(emp, ['email', 'Email'])).toLowerCase()} />
             <InfoLine icon={<Phone size={17} />} label="Telefone" value={getField(emp, ['telefone', 'Telefone'], '')} />
           </section>
 
-          <section className="rounded-lg border border-slate-200 p-4">
-            <h3 className="mb-3 text-sm font-bold uppercase text-slate-500">Localizacao</h3>
+          <section className="rounded-2xl border border-slate-200 p-4">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">Localização</h3>
             <InfoLine icon={<MapPin size={17} />} label="Endereco" value={buildAddress(emp)} />
             <InfoLine icon={<MapPin size={17} />} label="Bairro" value={getField(emp, ['bairro', 'Bairro'], '-')} />
             <InfoLine icon={<MapPin size={17} />} label="Cidade" value={getField(emp, ['municipioNome', 'MunicipioNome'], '-')} />
             <button type="button" onClick={() => onOpenMap(emp)} className="btn-info mt-3 w-full"><MapPin size={16} />Abrir no mapa</button>
           </section>
 
-          <section className="rounded-lg border border-slate-200 p-4">
-            <h3 className="mb-3 text-sm font-bold uppercase text-slate-500">Classificação</h3>
+          <section className="rounded-2xl border border-slate-200 p-4">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">Classificação</h3>
             <InfoLine icon={<Tag size={17} />} label="CNAE" value={getField(emp, ['cnaeDescricao', 'CnaeDescricao'], '-')} />
             <InfoLine icon={<Tag size={17} />} label="Segmento" value={getField(emp, ['segmento', 'Segmento'], '-')} />
             <InfoLine icon={<Tag size={17} />} label="Porte" value={getField(emp, ['porte', 'Porte'], '-')} />
