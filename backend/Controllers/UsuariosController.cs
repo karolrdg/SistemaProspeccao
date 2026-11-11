@@ -6,6 +6,8 @@ using Dapper;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Text;
+using ApiProspeccaoGSO.DTOs.Shared;
+using ApiProspeccaoGSO.DTOs.Usuarios;
 
 namespace ApiProspeccaoGSO.Controllers
 {
@@ -26,7 +28,7 @@ namespace ApiProspeccaoGSO.Controllers
 
         // 1. CADASTRAR
         [HttpPost("cadastrar")]
-        public async Task<IActionResult> Cadastrar([FromBody] UsuarioDTO model)
+        public async Task<IActionResult> Cadastrar([FromBody] CriarUsuarioDto model)
         {
             try
             {
@@ -36,12 +38,12 @@ namespace ApiProspeccaoGSO.Controllers
                 using var conn = new NpgsqlConnection(_connectionString);
                 var sql = @"INSERT INTO vendedores (nome, email, senha_hash, nivel) VALUES (@Nome, @Email, @Senha, @Nivel)";
                 await conn.ExecuteAsync(sql, new { Nome = model.Nome, Email = model.Email, Senha = senhaCriptografada, Nivel = model.Nivel });
-                return Ok(new { mensagem = "Usuário cadastrado com sucesso!" });
+                return Ok(new ApiUserMessageDto { Mensagem = "Usuário cadastrado com sucesso!" });
             }
             catch (System.Exception ex)
             {
                 _logger.LogError(ex, "Falha ao cadastrar usuário.");
-                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+                return StatusCode(500, new ApiErrorDto { Erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
@@ -52,20 +54,20 @@ namespace ApiProspeccaoGSO.Controllers
             try
             {
                 using var conn = new NpgsqlConnection(_connectionString);
-                var sql = "SELECT id, nome, email, nivel FROM vendedores ORDER BY nome ASC";
-                var usuarios = await conn.QueryAsync(sql);
+                var sql = "SELECT id AS Id, nome AS Nome, email AS Email, nivel AS Nivel FROM vendedores ORDER BY nome ASC";
+                var usuarios = await conn.QueryAsync<UsuarioResumoDto>(sql);
                 return Ok(usuarios);
             }
             catch (System.Exception ex)
             {
                 _logger.LogError(ex, "Falha ao listar usuários.");
-                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+                return StatusCode(500, new ApiErrorDto { Erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
         // 3. EDITAR SENHA
         [HttpPut("{id}/senha")]
-        public async Task<IActionResult> AlterarSenha(int id, [FromBody] AlterarSenhaDTO model)
+        public async Task<IActionResult> AlterarSenha(int id, [FromBody] AlterarSenhaDto model)
         {
             try
             {
@@ -75,12 +77,12 @@ namespace ApiProspeccaoGSO.Controllers
                 using var conn = new NpgsqlConnection(_connectionString);
                 var sql = "UPDATE vendedores SET senha_hash = @NovaSenha WHERE id = @Id";
                 await conn.ExecuteAsync(sql, new { NovaSenha = senhaCriptografada, Id = id });
-                return Ok(new { mensagem = "Senha atualizada com segurança!" });
+                return Ok(new ApiUserMessageDto { Mensagem = "Senha atualizada com segurança!" });
             }
             catch (System.Exception ex)
             {
                 _logger.LogError(ex, "Falha ao alterar senha do usuário {UsuarioId}.", id);
-                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+                return StatusCode(500, new ApiErrorDto { Erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
@@ -93,15 +95,15 @@ namespace ApiProspeccaoGSO.Controllers
                 using var conn = new NpgsqlConnection(_connectionString);
                 var sql = "DELETE FROM vendedores WHERE id = @Id";
                 await conn.ExecuteAsync(sql, new { Id = id });
-                return Ok(new { mensagem = "Usuário removido!" });
+                return Ok(new ApiUserMessageDto { Mensagem = "Usuário removido!" });
             }
             catch (System.Exception ex)
             {
                 if (ex.Message.Contains("violates foreign key constraint"))
-                    return StatusCode(400, new { erro = "Não é possível apagar este colaborador pois ele possui empresas na sua carteira." });
+                    return BadRequest(new ApiErrorDto { Erro = "Não é possível apagar este colaborador pois ele possui empresas na sua carteira." });
 
                 _logger.LogError(ex, "Falha ao apagar usuário {UsuarioId}.", id);
-                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+                return StatusCode(500, new ApiErrorDto { Erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
@@ -117,18 +119,5 @@ namespace ApiProspeccaoGSO.Controllers
             }
             return builder.ToString();
         }
-    }
-
-    public class UsuarioDTO
-    {
-        public string Nome { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Senha { get; set; } = string.Empty;
-        public string Nivel { get; set; } = string.Empty;
-    }
-
-    public class AlterarSenhaDTO
-    {
-        public string NovaSenha { get; set; } = string.Empty;
     }
 }

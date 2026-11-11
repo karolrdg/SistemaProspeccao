@@ -8,6 +8,8 @@ using System;
 using System.Threading.Tasks;
 using Npgsql;
 using Dapper;
+using ApiProspeccaoGSO.DTOs.Prospeccao;
+using ApiProspeccaoGSO.DTOs.Shared;
 
 namespace ApiProspeccaoGSO.Controllers
 {
@@ -17,23 +19,17 @@ namespace ApiProspeccaoGSO.Controllers
     public class ProspeccaoController : ControllerBase
     {
         private readonly string _connectionString;
+        private readonly ILogger<ProspeccaoController> _logger;
 
-        public ProspeccaoController(IConfiguration configuration)
+        public ProspeccaoController(IConfiguration configuration, ILogger<ProspeccaoController> logger)
         {
             _connectionString = configuration.GetConnectionString("DbProspeccao")
-                ?? throw new InvalidOperationException("Connection string n„o encontrada.");
+                ?? throw new InvalidOperationException("Connection string n√£o encontrada.");
+            _logger = logger;
         }
 
         [HttpGet("empresas")]
-        public async Task<IActionResult> BuscarEmpresas(
-            [FromQuery] string municipio,
-            [FromQuery] string? cnae,
-            [FromQuery] string? palavraCnae,
-            [FromQuery] string? porte,
-            [FromQuery] string? ordenacao,
-            [FromQuery] bool incluirInativas,
-            [FromQuery] string? segmento,
-            [FromQuery] string? capital)
+        public async Task<IActionResult> BuscarEmpresas([FromQuery] BuscarEmpresasDto filtro)
         {
             try
             {
@@ -41,7 +37,7 @@ namespace ApiProspeccaoGSO.Controllers
                 var sql = new StringBuilder();
                 var parametros = new DynamicParameters();
 
-                parametros.Add("Municipio", municipio);
+                parametros.Add("Municipio", filtro.Municipio);
 
                 sql.Append(@"
                     SELECT 
@@ -71,52 +67,52 @@ namespace ApiProspeccaoGSO.Controllers
                     LEFT JOIN cnaes_simplificados cs ON e.cnae_fiscal_principal::varchar = cs.subclasse::varchar
                     WHERE e.municipio = @Municipio");
 
-                if (!incluirInativas)
+                if (!filtro.IncluirInativas)
                 {
                     sql.Append(" AND e.situacao_cadastral = '02'");
                 }
 
-                if (!string.IsNullOrEmpty(cnae))
+                if (!string.IsNullOrEmpty(filtro.Cnae))
                 {
                     sql.Append(" AND e.cnae_fiscal_principal::varchar = @Cnae");
-                    parametros.Add("Cnae", cnae);
+                    parametros.Add("Cnae", filtro.Cnae);
                 }
 
-                if (!string.IsNullOrEmpty(palavraCnae))
+                if (!string.IsNullOrEmpty(filtro.PalavraCnae))
                 {
                     sql.Append(" AND c.descricao ILIKE @PalavraCnae");
-                    parametros.Add("PalavraCnae", $"%{palavraCnae}%");
+                    parametros.Add("PalavraCnae", $"%{filtro.PalavraCnae}%");
                 }
 
-                if (!string.IsNullOrEmpty(porte))
+                if (!string.IsNullOrEmpty(filtro.Porte))
                 {
                     sql.Append(" AND emp.porte_empresa::varchar = @Porte");
-                    parametros.Add("Porte", porte);
+                    parametros.Add("Porte", filtro.Porte);
                 }
 
-                if (!string.IsNullOrEmpty(segmento))
+                if (!string.IsNullOrEmpty(filtro.Segmento))
                 {
                     sql.Append(" AND cs.novo_seguimento ILIKE @Segmento");
-                    parametros.Add("Segmento", $"%{segmento}%");
+                    parametros.Add("Segmento", $"%{filtro.Segmento}%");
                 }
 
-                if (!string.IsNullOrEmpty(capital))
+                if (!string.IsNullOrEmpty(filtro.Capital))
                 {
                     string campoCapital = "REPLACE(COALESCE(NULLIF(emp.capital_social, ''), '0'), ',', '.')::numeric";
 
-                    if (capital == "ate_10k")
+                    if (filtro.Capital == "ate_10k")
                         sql.Append($" AND {campoCapital} <= 10000");
-                    else if (capital == "10k_50k")
+                    else if (filtro.Capital == "10k_50k")
                         sql.Append($" AND {campoCapital} > 10000 AND {campoCapital} <= 50000");
-                    else if (capital == "50k_100k")
+                    else if (filtro.Capital == "50k_100k")
                         sql.Append($" AND {campoCapital} > 50000 AND {campoCapital} <= 100000");
-                    else if (capital == "100k_500k")
+                    else if (filtro.Capital == "100k_500k")
                         sql.Append($" AND {campoCapital} > 100000 AND {campoCapital} <= 500000");
-                    else if (capital == "mais_500k")
+                    else if (filtro.Capital == "mais_500k")
                         sql.Append($" AND {campoCapital} > 500000");
                 }
 
-                if (ordenacao == "mais_novas")
+                if (filtro.Ordenacao == "mais_novas")
                 {
                     sql.Append(" ORDER BY e.data_inicio_atividade DESC");
                 }
@@ -127,12 +123,13 @@ namespace ApiProspeccaoGSO.Controllers
 
                 sql.Append(" LIMIT 500;");
 
-                var empresas = await connection.QueryAsync<dynamic>(sql.ToString(), parametros);
+                var empresas = await connection.QueryAsync<EmpresaProspeccaoDto>(sql.ToString(), parametros);
                 return Ok(empresas);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+                _logger.LogError(ex, "Falha ao buscar empresas para municipio {Municipio}.", filtro.Municipio);
+                return StatusCode(500, new ApiErrorDto { Erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
@@ -144,22 +141,23 @@ namespace ApiProspeccaoGSO.Controllers
             {
                 using var conn = new NpgsqlConnection(_connectionString);
                 var sql = @"
-                    SELECT DISTINCT novo_seguimento
+                    SELECT DISTINCT novo_seguimento AS ""NovoSeguimento""
                     FROM cnaes_simplificados
                     WHERE novo_seguimento IS NOT NULL
                       AND novo_seguimento <> ''
                     ORDER BY novo_seguimento ASC;";
-                var segmentos = await conn.QueryAsync(sql);
+                var segmentos = await conn.QueryAsync<SegmentoDto>(sql);
                 return Ok(segmentos);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+                _logger.LogError(ex, "Falha ao carregar segmentos.");
+                return StatusCode(500, new ApiErrorDto { Erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
         [HttpPost("autorizar")]
-        public async Task<IActionResult> AutorizarLeads([FromBody] List<LeadRequest> requests)
+        public async Task<IActionResult> AutorizarLeads([FromBody] List<SalvarLeadDto> requests)
         {
             try
             {
@@ -171,7 +169,7 @@ namespace ApiProspeccaoGSO.Controllers
                 var vendedorId = await conn.QueryFirstOrDefaultAsync<int>(
                     "SELECT id FROM vendedores WHERE email = @email", new { email = vendedorEmail });
 
-                if (vendedorId == 0) return Unauthorized(new { erro = "Vendedor n„o encontrado." });
+                if (vendedorId == 0) return Unauthorized(new ApiErrorDto { Erro = "Vendedor n√£o encontrado." });
 
                 foreach (var item in requests)
                 {
@@ -183,7 +181,7 @@ namespace ApiProspeccaoGSO.Controllers
                     {
                         if (donoExistente.Value != vendedorId && nivelUsuario != "Admin")
                         {
-                            return StatusCode(403, new { erro = "Esta empresa j· pertence a outro vendedor." });
+                            return StatusCode(403, new ApiErrorDto { Erro = "Esta empresa j√° pertence a outro vendedor." });
                         }
 
                         var sqlUpdate = @"
@@ -214,16 +212,16 @@ namespace ApiProspeccaoGSO.Controllers
                     }
                 }
 
-                return Ok(new { message = "Leads salvos com sucesso!" });
+                return Ok(new ApiMessageDto { Message = "Leads salvos com sucesso!" });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"ERRO FATAL AO SALVAR: {ex.Message}");
-                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+                _logger.LogError(ex, "Falha ao salvar leads.");
+                return StatusCode(500, new ApiErrorDto { Erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
-        // --- NOVA FUN«√O: DESVINCULAR EMPRESA ---
+        // --- NOVA FUN√á√ÉO: DESVINCULAR EMPRESA ---
         [HttpPost("liberar/{cnpj}")]
         public async Task<IActionResult> LiberarLead(string cnpj)
         {
@@ -237,36 +235,30 @@ namespace ApiProspeccaoGSO.Controllers
                 var vendedorId = await conn.QueryFirstOrDefaultAsync<int>(
                     "SELECT id FROM vendedores WHERE email = @email", new { email = vendedorEmail });
 
-                // Confere de quem È a empresa hoje
+                // Confere de quem √© a empresa hoje
                 var donoExistente = await conn.QueryFirstOrDefaultAsync<int?>(
                     "SELECT vendedor_id FROM funil_prospeccao WHERE cnpj_completo = @Cnpj",
                     new { Cnpj = cnpj });
 
                 if (!donoExistente.HasValue)
-                    return BadRequest(new { erro = "Esta empresa j· est· livre no sistema." });
+                    return BadRequest(new ApiErrorDto { Erro = "Esta empresa j√° est√° livre no sistema." });
 
-                // Regra de seguranÁa: SÛ libera se for o prÛprio dono ou um Admin
+                // Regra de seguran√ßa: S√≥ libera se for o pr√≥prio dono ou um Admin
                 if (donoExistente.Value != vendedorId && nivelUsuario != "Admin")
                 {
-                    return StatusCode(403, new { erro = "VocÍ n„o tem permiss„o para liberar a empresa de outro vendedor." });
+                    return StatusCode(403, new ApiErrorDto { Erro = "Voc√™ n√£o tem permiss√£o para liberar a empresa de outro vendedor." });
                 }
 
-                // Apaga o vÌnculo e a observaÁ„o (devolve pro mar limpa)
+                // Apaga o v√≠nculo e a observa√ß√£o (devolve pro mar limpa)
                 await conn.ExecuteAsync("DELETE FROM funil_prospeccao WHERE cnpj_completo = @Cnpj", new { Cnpj = cnpj });
 
-                return Ok(new { message = "Empresa liberada com sucesso!" });
+                return Ok(new ApiMessageDto { Message = "Empresa liberada com sucesso!" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+                _logger.LogError(ex, "Falha ao liberar lead {Cnpj}.", cnpj);
+                return StatusCode(500, new ApiErrorDto { Erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
-    }
-
-    public class LeadRequest
-    {
-        public string Cnpj { get; set; } = string.Empty;
-        public string ClinicaAtual { get; set; } = string.Empty;
-        public string Observacao { get; set; } = string.Empty;
     }
 }
