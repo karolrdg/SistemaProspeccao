@@ -11,15 +11,17 @@ namespace ApiProspeccaoGSO.Controllers
 {
     [ApiController]
     [Route("api/usuarios")]
-    // [Authorize(Roles = "Admin")] <-- COMENTADO CORRETAMENTE PARA TESTE
+    [Authorize(Roles = "Admin")]
     public class UsuariosController : ControllerBase
     {
         private readonly string _connectionString;
+        private readonly ILogger<UsuariosController> _logger;
 
-        public UsuariosController(IConfiguration configuration)
+        public UsuariosController(IConfiguration configuration, ILogger<UsuariosController> logger)
         {
             _connectionString = configuration.GetConnectionString("DbProspeccao")
                 ?? throw new System.InvalidOperationException("Connection string não encontrada.");
+            _logger = logger;
         }
 
         // 1. CADASTRAR
@@ -36,7 +38,11 @@ namespace ApiProspeccaoGSO.Controllers
                 await conn.ExecuteAsync(sql, new { Nome = model.Nome, Email = model.Email, Senha = senhaCriptografada, Nivel = model.Nivel });
                 return Ok(new { mensagem = "Usuário cadastrado com sucesso!" });
             }
-            catch (System.Exception ex) { return StatusCode(500, new { erro = ex.Message }); }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Falha ao cadastrar usuário.");
+                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+            }
         }
 
         // 2. LISTAR TODOS
@@ -50,7 +56,11 @@ namespace ApiProspeccaoGSO.Controllers
                 var usuarios = await conn.QueryAsync(sql);
                 return Ok(usuarios);
             }
-            catch (System.Exception ex) { return StatusCode(500, new { erro = ex.Message }); }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Falha ao listar usuários.");
+                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+            }
         }
 
         // 3. EDITAR SENHA
@@ -67,7 +77,11 @@ namespace ApiProspeccaoGSO.Controllers
                 await conn.ExecuteAsync(sql, new { NovaSenha = senhaCriptografada, Id = id });
                 return Ok(new { mensagem = "Senha atualizada com segurança!" });
             }
-            catch (System.Exception ex) { return StatusCode(500, new { erro = ex.Message }); }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Falha ao alterar senha do usuário {UsuarioId}.", id);
+                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
+            }
         }
 
         // 4. APAGAR USUÁRIO
@@ -86,7 +100,8 @@ namespace ApiProspeccaoGSO.Controllers
                 if (ex.Message.Contains("violates foreign key constraint"))
                     return StatusCode(400, new { erro = "Não é possível apagar este colaborador pois ele possui empresas na sua carteira." });
 
-                return StatusCode(500, new { erro = ex.Message });
+                _logger.LogError(ex, "Falha ao apagar usuário {UsuarioId}.", id);
+                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 

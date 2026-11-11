@@ -21,13 +21,15 @@ namespace ApiProspeccaoGSO.Controllers
     {
         private readonly string _connectionString;
         private readonly string _jwtKey;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration, ILogger<AuthController> logger)
         {
             _connectionString = configuration.GetConnectionString("DbProspeccao")
                 ?? throw new Exception("String de conexão não encontrada.");
             _jwtKey = configuration["JwtSettings:SecretKey"]
                 ?? throw new Exception("JwtSettings:SecretKey não configurada.");
+            _logger = logger;
         }
 
         [HttpPost("login")]
@@ -35,9 +37,6 @@ namespace ApiProspeccaoGSO.Controllers
         {
             try
             {
-                Console.WriteLine($"\n--- TENTATIVA DE LOGIN ---");
-                Console.WriteLine($"Email recebido: '{request.Email}'");
-
                 if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Senha))
                 {
                     return BadRequest(new { erro = "E-mail ou senha não foram enviados." });
@@ -50,7 +49,6 @@ namespace ApiProspeccaoGSO.Controllers
 
                 if (usuario == null)
                 {
-                    Console.WriteLine("ERRO: E-mail não encontrado no banco de dados.");
                     return Unauthorized(new { erro = "E-mail ou senha incorretos." }); // Mensagem genérica por segurança
                 }
 
@@ -61,7 +59,6 @@ namespace ApiProspeccaoGSO.Controllers
 
                 if (senhaBanco.Trim() != senhaHasheada)
                 {
-                    Console.WriteLine("ERRO: Senha não bate com o Hash do banco de dados.");
                     return Unauthorized(new { erro = "E-mail ou senha incorretos." });
                 }
 
@@ -84,8 +81,6 @@ namespace ApiProspeccaoGSO.Controllers
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);
 
-                Console.WriteLine("SUCESSO: Login autorizado!\n");
-
                 return Ok(new
                 {
                     token = tokenString,
@@ -95,8 +90,8 @@ namespace ApiProspeccaoGSO.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"ERRO FATAL: {ex.Message}");
-                return StatusCode(500, new { erro = $"Erro interno: {ex.Message}" });
+                _logger.LogError(ex, "Falha ao autenticar usuário.");
+                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 

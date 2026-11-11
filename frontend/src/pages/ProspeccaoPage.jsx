@@ -114,8 +114,19 @@ export function ProspeccaoPage({ session, logout, ui }) {
         setMessage(data.erro || 'Erro ao buscar empresas.');
         ui.notify({ type: 'error', title: 'Erro na busca', message: data.erro || 'Nao foi possivel buscar empresas.' });
         setEmpresas([]);
+        setDrafts({});
         return;
       }
+
+      if (!Array.isArray(data)) {
+        const errorMessage = 'A API retornou uma resposta invalida ao buscar empresas.';
+        setEmpresas([]);
+        setDrafts({});
+        setMessage(errorMessage);
+        ui.notify({ type: 'error', title: 'Resposta invalida', message: errorMessage });
+        return;
+      }
+
       setEmpresas(data);
       setDrafts(createDrafts(data));
       setPage(1);

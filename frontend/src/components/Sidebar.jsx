@@ -1,39 +1,39 @@
 import { CircleUser, LogOut, Search, UsersRound } from 'lucide-react';
 
-export function Sidebar({ activeSection, setActiveSection, nome, logout }) {
+export function Sidebar({ activeSection, setActiveSection, nome, nivel, logout }) {
   const itemClass = (section) =>
-    `group flex w-full items-center border-l-4 px-4 py-4 text-left text-sm font-semibold transition ${activeSection === section
-      ? 'border-sky-400 bg-white/10 text-white'
-      : 'border-transparent text-white/80 hover:border-sky-600 hover:bg-white/10 hover:text-white'
+    `relative mx-auto flex h-12 w-12 items-center justify-center rounded-2xl transition ${activeSection === section
+      ? 'bg-white text-sky-800 shadow-lg shadow-slate-950/20'
+      : 'text-slate-300 hover:bg-white/10 hover:text-white'
     }`;
 
   return (
-    <aside className="group fixed inset-y-0 left-0 z-30 flex w-[76px] flex-col overflow-hidden whitespace-nowrap bg-gso-navy transition-all duration-300 hover:w-64 md:w-[85px]">
-      <div className="flex h-24 items-center justify-center border-b border-white/10 px-3">
-        <img src="/img/logo-menu.png" alt="ProspectCRM" className="max-h-12 max-w-14 object-contain transition-all duration-300 group-hover:max-w-44" />
+    <aside className="fixed inset-y-0 left-0 z-30 flex w-[68px] flex-col items-center border-r border-white/10 bg-[#10263d] px-2 text-white shadow-xl shadow-slate-950/10 sm:w-[76px]">
+      <div className="flex h-[76px] w-full items-center justify-center border-b border-white/10">
+        <img src="/img/logo-menu.png" alt="ProspectCRM" title="ProspectCRM" className="max-h-10 max-w-12 object-contain" />
       </div>
-      <nav className="flex-1 pt-4">
-        <button type="button" className={itemClass('prospeccao')} onClick={() => setActiveSection('prospeccao')}>
-          <Search className="h-5 min-w-11" />
-          <span className="opacity-0 transition group-hover:opacity-100">Prospecção</span>
+      <nav className="flex w-full flex-1 flex-col items-center gap-2 pt-5" aria-label="Navegação principal">
+        <button type="button" aria-label="Prospecção" title="Prospecção" className={itemClass('prospeccao')} onClick={() => setActiveSection('prospeccao')}>
+          <Search size={19} strokeWidth={2.2} />
         </button>
-        <button type="button" className={itemClass('usuarios')} onClick={() => setActiveSection('usuarios')}>
-          <UsersRound className="h-5 min-w-11" />
-          <span className="opacity-0 transition group-hover:opacity-100">Colaboradores</span>
-        </button>
+        {nivel === 'Admin' && (
+          <button type="button" aria-label="Colaboradores" title="Colaboradores" className={itemClass('usuarios')} onClick={() => setActiveSection('usuarios')}>
+            <UsersRound size={19} strokeWidth={2.2} />
+          </button>
+        )}
       </nav>
-      <div className="space-y-3 border-t border-white/10 p-4">
-        <div className="flex items-center text-white/90">
-          <CircleUser className="h-6 min-w-11" />
-          <span className="truncate text-sm font-semibold opacity-0 transition group-hover:opacity-100">{nome}</span>
+      <div className="flex w-full flex-col items-center gap-3 border-t border-white/10 py-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-sm font-bold text-white" title={nome || 'Perfil'}>
+          {nome?.trim()?.charAt(0)?.toUpperCase() || <CircleUser size={18} />}
         </div>
         <button
           type="button"
           onClick={logout}
-          className="flex w-full items-center rounded border border-red-400/80 py-2 text-red-200 transition hover:bg-red-500 hover:text-white"
+          aria-label="Sair"
+          title="Sair"
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-300 transition hover:bg-rose-500/15 hover:text-rose-200"
         >
-          <LogOut className="h-5 min-w-11" />
-          <span className="opacity-0 transition group-hover:opacity-100">Sair</span>
+          <LogOut size={18} />
         </button>
       </div>
     </aside>

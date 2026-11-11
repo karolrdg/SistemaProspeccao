@@ -43,7 +43,7 @@ export function SearchableSelect({
       <button
         type="button"
         disabled={disabled}
-        className="input mb-3 flex min-h-[42px] items-center justify-between gap-2 text-left disabled:opacity-75"
+        className="input flex min-h-11 items-center justify-between gap-2 text-left disabled:opacity-75"
         onClick={() => setOpen((prev) => !prev)}
       >
         <span className={`truncate ${selected ? 'text-slate-800' : 'text-slate-400'}`}>{selected?.label || placeholder}</span>

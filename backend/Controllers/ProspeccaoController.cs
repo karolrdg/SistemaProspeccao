@@ -130,9 +130,9 @@ namespace ApiProspeccaoGSO.Controllers
                 var empresas = await connection.QueryAsync<dynamic>(sql.ToString(), parametros);
                 return Ok(empresas);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { erro = ex.Message });
+                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
@@ -152,9 +152,9 @@ namespace ApiProspeccaoGSO.Controllers
                 var segmentos = await conn.QueryAsync(sql);
                 return Ok(segmentos);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { erro = ex.Message });
+                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
@@ -219,7 +219,7 @@ namespace ApiProspeccaoGSO.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"ERRO FATAL AO SALVAR: {ex.Message}");
-                return StatusCode(500, new { erro = ex.Message });
+                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
 
@@ -256,9 +256,9 @@ namespace ApiProspeccaoGSO.Controllers
 
                 return Ok(new { message = "Empresa liberada com sucesso!" });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { erro = ex.Message });
+                return StatusCode(500, new { erro = "Ocorreu um erro interno. Tente novamente." });
             }
         }
     }

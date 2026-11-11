@@ -40,13 +40,14 @@ function App() {
         activeSection={activeSection}
         setActiveSection={setActiveSection}
         nome={session.nome}
+        nivel={session.nivel}
         logout={logout}
       />
-      <main className="ml-[76px] min-h-screen p-4 transition-all duration-300 md:ml-[85px] md:p-6">
-        {activeSection === 'prospeccao' ? (
-          <ProspeccaoPage session={session} logout={logout} ui={ui} />
-        ) : (
+      <main className="ml-[68px] min-h-screen px-4 py-6 transition-all duration-300 sm:ml-[76px] sm:px-6 md:py-8 xl:px-10">
+        {activeSection === 'usuarios' && session.nivel === 'Admin' ? (
           <UsuariosPage session={session} logout={logout} ui={ui} />
+        ) : (
+          <ProspeccaoPage session={session} logout={logout} ui={ui} />
         )}
       </main>
 
