@@ -7,7 +7,7 @@ namespace ApiProspeccaoGSO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [AllowAnonymous]
+
     public class DominiosController : ControllerBase
     {
         private readonly string _connectionString;

@@ -93,25 +93,3 @@ O sistema ainda está em evolução e algumas partes carregam referências do pr
 
 Evoluir o projeto de um sistema acadêmico funcional para uma solução mais profissional, escalável e adaptável para diferentes cenários comerciais.
 
-## 🚀 Como Executar o Projeto Localmente
-
-### Pré-requisitos
-*   [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-*   [Node.js](https://nodejs.org/)
-*   Instância do [PostgreSQL](https://www.postgresql.org/) ativa
-
-### 1. Configurando o Backend (API)
-```bash
-# Entre na pasta da API backend
-cd apiprospeccaogso
-
-# Execute a API (ela utilizará os User Secrets configurados localmente)
-dotnet run
-# Volte para a raiz e entre na pasta do frontend
-cd ../frontend
-
-# Instale as dependências do React
-npm install
-
-# Inicie o servidor de desenvolvimento do Tailwind/React
-npm run dev
